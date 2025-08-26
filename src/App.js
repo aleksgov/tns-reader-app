@@ -1,24 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Menu, Trash2, FolderOpen, Copy, Share, Clipboard, Settings, Image } from 'lucide-react';
 
 export default function ImageToTextApp() {
     const [selectedImage, setSelectedImage] = useState(null);
     const [extractedText, setExtractedText] = useState('');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [history, setHistory] = useState([
-        {
-            id: 1,
-            name: 'test2.png',
-            date: '26.08.2025 14:02:09',
-            type: 'png'
-        },
-        {
-            id: 2,
-            name: 'test.jpg',
-            date: '26.08.2025 14:02:02',
-            type: 'jpg'
-        },
-    ]);
+    const [history, setHistory] = useState([]);
+
+    // загрузка истории при запуске
+    useEffect(() => {
+        const savedHistory = localStorage.getItem('imageToTextHistory');
+        if (savedHistory) {
+            try {
+                setHistory(JSON.parse(savedHistory));
+            } catch (error) {
+                console.error('Ошибка загрузки истории:', error);
+                setHistory([]);
+            }
+        }
+    }, []);
+
+    // сохранение истории при ее изменении
+    useEffect(() => {
+        localStorage.setItem('imageToTextHistory', JSON.stringify(history));
+    }, [history]);
 
     const handleDeleteFile = (id) => {
         setHistory(history.filter(file => file.id !== id));
@@ -28,16 +33,39 @@ export default function ImageToTextApp() {
         setHistory([]);
     };
 
+    const addToHistory = (file, imageData) => {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('ru-RU') + ' ' + now.toLocaleTimeString('ru-RU');
+        const fileType = file.name.split('.').pop().toLowerCase();
+
+        const historyItem = {
+            id: Date.now(),
+            name: file.name,
+            date: dateStr,
+            type: fileType,
+            imageData: imageData
+        };
+
+        setHistory(prev => [historyItem, ...prev]);
+    };
+
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                setSelectedImage(e.target.result);
+                const imageData = e.target.result;
+                setSelectedImage(imageData);
                 setExtractedText('some text');
+                addToHistory(file, imageData);
             };
             reader.readAsDataURL(file);
         }
+    };
+
+    const handleHistoryFileClick = (historyItem) => {
+        setSelectedImage(historyItem.imageData);
+        setExtractedText('some text');
     };
 
     return (
@@ -54,14 +82,12 @@ export default function ImageToTextApp() {
                         {isMenuOpen && <span className="ml-2 text-white text-sm">Меню</span>}
                     </div>
 
-                    {/* Иконка настроек */}
                     <div className={`flex items-center p-4 ${isMenuOpen ? '' : 'justify-center'} mt-auto`}>
                         <Settings className="w-4 h-4 text-gray-400 cursor-pointer hover:text-white flex-shrink-0" />
                         {isMenuOpen && <span className="ml-2 text-white text-sm">Настройки</span>}
                     </div>
                 </div>
 
-                {/* Область с файлами (всегда открыта) */}
                 <div className="w-72 bg-gray-800/40 backdrop-blur-sm rounded-2xl border border-gray-700/30 flex flex-col">
                     {/* Выбранные файлы */}
                     <div className="px-4 pb-4 pt-4">
@@ -90,11 +116,14 @@ export default function ImageToTextApp() {
                             {history.map((file) => (
                                 <div
                                     key={file.id}
-                                    className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-700/30 transition-colors group"
+                                    className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-700/30 transition-colors group cursor-pointer"
+                                    onClick={() => handleHistoryFileClick(file)}
                                 >
                                     <div className="flex items-center min-w-0 flex-1">
                                         <div className={`w-7 h-5 rounded text-xs font-bold flex items-center justify-center mr-3 text-white flex-shrink-0 ${
-                                            file.type === 'png' ? 'bg-purple-600' : 'bg-green-600'
+                                            file.type === 'png' ? 'bg-purple-600' :
+                                                file.type === 'jpg' || file.type === 'jpeg' ? 'bg-green-600' :
+                                                    'bg-blue-600'
                                         }`}>
                                             {file.type}
                                         </div>
@@ -104,7 +133,10 @@ export default function ImageToTextApp() {
                                         </div>
                                     </div>
                                     <button
-                                        onClick={() => handleDeleteFile(file.id)}
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // не открываем файл при клике на кнопку удаления
+                                            handleDeleteFile(file.id);
+                                        }}
                                         className="p-1 text-red-400 hover:text-red-300 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
                                     >
                                         <Trash2 className="w-3 h-3" />
@@ -128,6 +160,8 @@ export default function ImageToTextApp() {
 
                 {/* Область для изображения и текста */}
                 <div className="flex-1 flex flex-row gap-4">
+
+                    {/* Область для изображения*/}
                     <div className="flex-1 bg-gray-800/40 backdrop-blur-sm rounded-2xl border border-gray-700/30 flex flex-col p-6">
                         <div className="flex-1 flex items-center justify-center">
                             {selectedImage ? (
