@@ -51,7 +51,7 @@ export default function ImageToTextApp() {
 
               {/* Выбранные файлы */}
               <div className="px-4 pb-4">
-                <h3 className="text-white font-medium text-sm mb-3">Selected Files</h3>
+                <h3 className="text-white font-medium text-sm mb-3">Выбранные файлы</h3>
                 <div className="bg-gray-700/30 rounded-xl p-8 border-2 border-dashed border-gray-600/40 text-center">
                   <input
                       type="file"
@@ -107,7 +107,7 @@ export default function ImageToTextApp() {
                     className="flex items-center justify-center w-full p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-colors text-sm"
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Delete All
+                  Удалить все
                 </button>
               </div>
 
@@ -117,47 +117,42 @@ export default function ImageToTextApp() {
               </div>
             </div>
 
-            {/* Правая область */}
-            <div className="flex-1 flex flex-col gap-4">
-              {/* Правая область для изображения */}
-              <div className="flex-1 bg-gray-800/40 backdrop-blur-sm rounded-2xl border border-gray-700/30 flex flex-col">
-                <div className="flex-1 flex items-center justify-center p-6">
-                  {selectedImage ? (
-                      <img
-                          src={selectedImage}
-                          alt="Selected"
-                          className="max-w-full max-h-full object-contain rounded-lg"
-                      />
-                  ) : (
-                      <div className="text-center opacity-50">
-                        <div className="w-20 h-20 bg-gray-600 rounded-lg flex items-center justify-center mx-auto mb-3">
-                          <Image className="w-10 h-10 text-gray-400" />
+            {/* Область для изображения */}
+            <div className="flex-1 flex flex-row gap-4">
+                <div className="flex-1 bg-gray-800/40 backdrop-blur-sm rounded-2xl border border-gray-700/30 flex items-center justify-center p-6">
+                    {selectedImage ? (
+                        <img
+                            src={selectedImage}
+                            alt="Selected"
+                            className="max-w-full max-h-full object-contain rounded-lg"
+                        />
+                    ) : (
+                        <div className="text-center opacity-50">
+                            <div className="w-20 h-20 bg-gray-600 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                <Image className="w-10 h-10 text-gray-400" />
+                            </div>
+                            <p className="text-gray-400 text-sm">Изображение не выбрано</p>
                         </div>
-                        <p className="text-gray-400 text-sm">Изображение не выбрано</p>
-                      </div>
-                  )}
+                    )}
                 </div>
-              </div>
 
-              {/* Нижняя область для вывода текста */}
-              <div className="h-64 bg-gray-800/40 backdrop-blur-sm rounded-2xl border border-gray-700/30 p-6">
-                {extractedText ? (
-                    <div className="h-full">
-                      <div className="text-gray-200 text-sm leading-relaxed whitespace-pre-wrap overflow-auto h-full">
-                        {extractedText}
-                      </div>
-                    </div>
-                ) : (
-                    <div className="flex items-center justify-center h-full text-center opacity-50">
-                      <div>
-                        <div className="w-12 h-12 bg-gray-600 rounded-lg flex items-center justify-center mx-auto mb-3">
-                          <Copy className="w-6 h-6 text-gray-400" />
+                {/* Область для текста */}
+                <div className="flex-1 bg-gray-800/40 backdrop-blur-sm rounded-2xl border border-gray-700/30 p-6 overflow-auto">
+                    {extractedText ? (
+                        <div className="text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">
+                            {extractedText}
                         </div>
-                        <p className="text-gray-400 text-sm">Извлечённый текст появится здесь</p>
-                      </div>
-                    </div>
-                )}
-              </div>
+                    ) : (
+                        <div className="flex items-center justify-center h-full text-center opacity-50">
+                            <div>
+                                <div className="w-12 h-12 bg-gray-600 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                    <Copy className="w-6 h-6 text-gray-400" />
+                                </div>
+                                <p className="text-gray-400 text-sm">Извлечённый текст появится здесь</p>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
           </div>
 
