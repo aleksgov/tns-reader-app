@@ -70,10 +70,10 @@ export default function ImageToTextApp() {
     };
 
     return (
-        <div className="h-screen bg-gradient-to-br from-slate-800 via-slate-900 to-gray-900 flex flex-col">
+        <div className="h-screen bg-gradient-to-br bg-[#2b2b2b] flex flex-col">
             <div className="flex flex-1 p-4 gap-4">
                 {/* Боковая панель меню */}
-                <div className={`bg-gray-800/40 backdrop-blur-sm rounded-2xl border border-gray-700/30 flex flex-col transition-all duration-300 overflow-hidden ${isMenuOpen ? 'w-72' : 'w-16'}`}>
+                <div className={`bg-[#2b2b2b] backdrop-blur-sm rounded-2xl border border-gray-700/30 flex flex-col transition-all duration-300 overflow-hidden ${isMenuOpen ? 'w-72' : 'w-10'}`}>
                     {/* Иконка меню */}
                     <div className={`flex items-center p-4 ${isMenuOpen ? '' : 'justify-center'}`}>
                         <Menu
@@ -89,7 +89,7 @@ export default function ImageToTextApp() {
                     </div>
                 </div>
 
-                <div className={`bg-gray-800/40 backdrop-blur-sm rounded-2xl border border-gray-700/30 flex flex-col transition-all duration-300 ${isSidebarOpen ? 'w-72' : 'w-0 overflow-hidden opacity-0'}`}>
+                <div className={`bg-[#3a3a3a] backdrop-blur-sm rounded-2xl border border-gray-700/30 flex flex-col transition-all duration-300 ${isSidebarOpen ? 'w-72' : 'w-0 overflow-hidden opacity-0'}`}>
                     {/* Выбранные файлы */}
                     <div className="px-4 pb-4 pt-4">
                         <h3 className="text-white font-medium text-sm mb-3">Выбранные файлы</h3>
@@ -163,7 +163,7 @@ export default function ImageToTextApp() {
                 <div className="flex-1 flex flex-row gap-4">
 
                     {/* Область для изображения*/}
-                    <div className="flex-1 bg-gray-800/40 backdrop-blur-sm rounded-2xl border border-gray-700/30 flex flex-col p-6">
+                    <div className="flex-1 rounded-2xl border bg-[#3a3a3a] border-gray-700/30 flex flex-col p-6">
                         <div className="flex-1 flex items-center justify-center">
                             {selectedImage ? (
                                 <img
@@ -184,16 +184,16 @@ export default function ImageToTextApp() {
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                                    className="flex items-center justify-center px-4 py-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-md transition-colors text-white"
+                                    className="flex items-center justify-center px-4 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-md transition-colors text-white"
                                 >
                                     <ChevronLeft className={`w-4 h-4 transition-transform ${isSidebarOpen ? '' : 'rotate-180'}`} />
                                 </button>
-                                <button className="flex items-center px-4 py-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-md transition-colors text-white text-sm">
+                                <button className="flex items-center px-4 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-md transition-colors text-white text-sm">
                                     <FolderOpen className="w-4 h-4 mr-2" />
                                     Открыть файл(ы)
                                 </button>
                             </div>
-                            <button className="flex items-center px-4 py-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-md transition-colors text-white text-sm">
+                            <button className="flex items-center px-4 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-md transition-colors text-white text-sm">
                                 <Clipboard className="w-4 h-4 mr-2" />
                                 Вставить
                             </button>
@@ -201,7 +201,7 @@ export default function ImageToTextApp() {
                     </div>
 
                     {/* Область для текста */}
-                    <div className="flex-1 bg-gray-800/40 backdrop-blur-sm rounded-2xl border border-gray-700/30 flex flex-col p-6">
+                    <div className="flex-1 bg-[#3a3a3a] backdrop-blur-sm rounded-2xl border border-gray-700/30 flex flex-col p-6">
                         <div className="flex-1 overflow-auto">
                             {extractedText ? (
                                 <div className="text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">
@@ -219,11 +219,11 @@ export default function ImageToTextApp() {
                             )}
                         </div>
                         <div className="flex justify-between mt-4 -mx-2 -mb-2">
-                            <button className="flex items-center px-3 py-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-colors text-white text-sm">
+                            <button className="flex items-center px-3 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-lg transition-colors text-white text-sm">
                                 <Share className="w-4 h-4 mr-2" />
                                 Поделится
                             </button>
-                            <button className="flex items-center px-3 py-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-colors text-white text-sm">
+                            <button className="flex items-center px-3 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-lg transition-colors text-white text-sm">
                                 <Copy className="w-4 h-4 mr-2" />
                                 Копировать
                             </button>
