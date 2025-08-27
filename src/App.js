@@ -10,15 +10,8 @@ export default function ImageToTextApp() {
 
     // загрузка истории при запуске
     useEffect(() => {
-        const savedHistory = localStorage.getItem('imageToTextHistory');
-        if (savedHistory) {
-            try {
-                setHistory(JSON.parse(savedHistory));
-            } catch (error) {
-                console.error('Ошибка загрузки истории:', error);
-                setHistory([]);
-            }
-        }
+        const savedHistory = JSON.parse(localStorage.getItem('imageToTextHistory') || '[]');
+        setHistory(savedHistory);
     }, []);
 
     // сохранение истории при ее изменении
@@ -71,9 +64,9 @@ export default function ImageToTextApp() {
 
     return (
         <div className="h-screen bg-gradient-to-br bg-[#2b2b2b] flex flex-col">
-            <div className="flex flex-1 p-4 gap-4">
+            <div className="flex flex-1 p-2 gap-2">
                 {/* Боковая панель меню */}
-                <div className={`bg-[#2b2b2b] backdrop-blur-sm rounded-2xl border border-gray-700/30 flex flex-col transition-all duration-300 overflow-hidden ${isMenuOpen ? 'w-72' : 'w-10'}`}>
+                <div className={`bg-[#2b2b2b] backdrop-blur-sm rounded-2xl border border-gray-700/30 flex flex-col transition-all duration-300 overflow-hidden ${isMenuOpen ? 'w-72' : 'w-8'}`}>
                     {/* Иконка меню */}
                     <div className={`flex items-center p-4 ${isMenuOpen ? '' : 'justify-center'}`}>
                         <Menu
@@ -89,144 +82,146 @@ export default function ImageToTextApp() {
                     </div>
                 </div>
 
-                <div className={`bg-[#3a3a3a] backdrop-blur-sm rounded-2xl border border-gray-700/30 flex flex-col transition-all duration-300 ${isSidebarOpen ? 'w-72' : 'w-0 overflow-hidden opacity-0'}`}>
-                    {/* Выбранные файлы */}
-                    <div className="px-4 pb-4 pt-4">
-                        <h3 className="text-white font-medium text-sm mb-3">Выбранные файлы</h3>
-                        <div className="bg-gray-700/30 rounded-xl p-8 border-2 border-dashed border-gray-600/40 text-center">
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleFileUpload}
-                                className="hidden"
-                                id="file-upload"
-                            />
-                            <label
-                                htmlFor="file-upload"
-                                className="cursor-pointer block hover:bg-gray-600/20 p-4 rounded-lg transition-colors"
-                            >
-                                <div className="text-gray-500 text-xs">Перетащите файлы сюда или нажмите чтобы выбрать</div>
-                            </label>
-                        </div>
-                    </div>
-
-                    {/* История */}
-                    <div className="flex-1 px-4 pb-4 overflow-auto">
-                        <h3 className="text-white font-medium text-sm mb-3">История</h3>
-                        <div className="space-y-1">
-                            {history.map((file) => (
-                                <div
-                                    key={file.id}
-                                    className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-700/30 transition-colors group cursor-pointer"
-                                    onClick={() => handleHistoryFileClick(file)}
-                                >
-                                    <div className="flex items-center min-w-0 flex-1">
-                                        <div className={`w-7 h-5 rounded text-xs font-bold flex items-center justify-center mr-3 text-white flex-shrink-0 ${
-                                            file.type === 'png' ? 'bg-purple-600' :
-                                                file.type === 'jpg' || file.type === 'jpeg' ? 'bg-green-600' :
-                                                    'bg-blue-600'
-                                        }`}>
-                                            {file.type}
-                                        </div>
-                                        <div className="min-w-0 flex-1">
-                                            <div className="text-white text-xs font-medium truncate">{file.name}</div>
-                                            <div className="text-gray-400 text-xs">{file.date}</div>
-                                        </div>
-                                    </div>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation(); // не открываем файл при клике на кнопку удаления
-                                            handleDeleteFile(file.id);
-                                        }}
-                                        className="p-1 text-red-400 hover:text-red-300 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                {/* Основная рабочая область */}
+                <div className="flex-1 bg-[#303030] rounded-2xl border border-gray-700/30 p-8">
+                    <div className="flex flex-row gap-2 h-full">
+                        {/* Область файлов */}
+                        <div className={`bg-[#3a3a3a] backdrop-blur-sm rounded-xl border border-gray-700/30 flex flex-col transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-0 overflow-hidden opacity-0'}`}>
+                            {/* Выбранные файлы */}
+                            <div className="px-4 pb-4 pt-4">
+                                <h3 className="text-white font-medium text-sm mb-3">Выбранные файлы</h3>
+                                <div className="bg-gray-700/30 rounded-xl p-6 border-2 border-dashed border-gray-600/40 text-center">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleFileUpload}
+                                        className="hidden"
+                                        id="file-upload"
+                                    />
+                                    <label
+                                        htmlFor="file-upload"
+                                        className="cursor-pointer block hover:bg-gray-600/20 p-3 rounded-lg transition-colors"
                                     >
-                                        <Trash2 className="w-3 h-3" />
-                                    </button>
+                                        <div className="text-gray-500 text-xs">Перетащите файлы сюда или нажмите чтобы выбрать</div>
+                                    </label>
                                 </div>
-                            ))}
-                        </div>
-                    </div>
+                            </div>
 
-                    {/* Кнопка для удаления всего */}
-                    <div className="p-4 border-t border-gray-700/30">
-                        <button
-                            onClick={handleDeleteAll}
-                            className="flex items-center justify-center w-full p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-colors text-sm"
-                        >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Удалить все
-                        </button>
-                    </div>
-                </div>
-
-                {/* Область для изображения и текста */}
-                <div className="flex-1 flex flex-row gap-4">
-
-                    {/* Область для изображения*/}
-                    <div className="flex-1 rounded-2xl border bg-[#3a3a3a] border-gray-700/30 flex flex-col p-6">
-                        <div className="flex-1 flex items-center justify-center">
-                            {selectedImage ? (
-                                <img
-                                    src={selectedImage}
-                                    alt="Selected"
-                                    className="max-w-full max-h-full object-contain rounded-lg"
-                                />
-                            ) : (
-                                <div className="text-center opacity-50">
-                                    <div className="w-20 h-20 bg-gray-600 rounded-lg flex items-center justify-center mx-auto mb-3">
-                                        <Image className="w-10 h-10 text-gray-400" />
-                                    </div>
-                                    <p className="text-gray-400 text-sm">Изображение не выбрано</p>
+                            {/* История */}
+                            <div className="flex-1 px-4 pb-4 overflow-auto">
+                                <h3 className="text-white font-medium text-sm mb-3">История</h3>
+                                <div className="space-y-1">
+                                    {history.map((file) => (
+                                        <div
+                                            key={file.id}
+                                            className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-700/30 transition-colors group cursor-pointer"
+                                            onClick={() => handleHistoryFileClick(file)}
+                                        >
+                                            <div className="flex items-center min-w-0 flex-1">
+                                                <div className={`w-7 h-5 rounded text-xs font-bold flex items-center justify-center mr-3 text-white flex-shrink-0 ${
+                                                    file.type === 'png' ? 'bg-purple-600' :
+                                                        file.type === 'jpg' || file.type === 'jpeg' ? 'bg-green-600' :
+                                                            'bg-blue-600'
+                                                }`}>
+                                                    {file.type}
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="text-white text-xs font-medium truncate">{file.name}</div>
+                                                    <div className="text-gray-400 text-xs">{file.date}</div>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDeleteFile(file.id);
+                                                }}
+                                                className="p-1 text-red-400 hover:text-red-300 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                                            >
+                                                <Trash2 className="w-3 h-3" />
+                                            </button>
+                                        </div>
+                                    ))}
                                 </div>
-                            )}
-                        </div>
-                        <div className="flex justify-between items-end mt-4 -mx-2 -mb-2">
-                            <div className="flex gap-2">
+                            </div>
+
+                            {/* Кнопка для удаления всего */}
+                            <div className="p-4 border-t border-gray-700/30">
                                 <button
-                                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                                    className="flex items-center justify-center px-4 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-md transition-colors text-white"
+                                    onClick={handleDeleteAll}
+                                    className="flex items-center justify-center w-full p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-colors text-sm"
                                 >
-                                    <ChevronLeft className={`w-4 h-4 transition-transform ${isSidebarOpen ? '' : 'rotate-180'}`} />
-                                </button>
-                                <button className="flex items-center px-4 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-md transition-colors text-white text-sm">
-                                    <FolderOpen className="w-4 h-4 mr-2" />
-                                    Открыть файл(ы)
+                                    <Trash2 className="w-4 h-4 mr-2" />
+                                    Удалить все
                                 </button>
                             </div>
-                            <button className="flex items-center px-4 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-md transition-colors text-white text-sm">
-                                <Clipboard className="w-4 h-4 mr-2" />
-                                Вставить
-                            </button>
                         </div>
-                    </div>
 
-                    {/* Область для текста */}
-                    <div className="flex-1 bg-[#3a3a3a] backdrop-blur-sm rounded-2xl border border-gray-700/30 flex flex-col p-6">
-                        <div className="flex-1 overflow-auto">
-                            {extractedText ? (
-                                <div className="text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">
-                                    {extractedText}
-                                </div>
-                            ) : (
-                                <div className="flex items-center justify-center h-full text-center opacity-50">
-                                    <div>
-                                        <div className="w-12 h-12 bg-gray-600 rounded-lg flex items-center justify-center mx-auto mb-3">
-                                            <Copy className="w-6 h-6 text-gray-400" />
+                        {/* Область для изображения */}
+                        <div className="flex-1 rounded-xl border bg-[#3a3a3a] border-gray-700/30 flex flex-col p-4">
+                            <div className="flex-1 flex items-center justify-center">
+                                {selectedImage ? (
+                                    <img
+                                        src={selectedImage}
+                                        alt="Selected"
+                                        className="max-w-full max-h-full object-contain rounded-lg"
+                                    />
+                                ) : (
+                                    <div className="text-center opacity-50">
+                                        <div className="w-20 h-20 bg-gray-600 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                            <Image className="w-10 h-10 text-gray-400" />
                                         </div>
-                                        <p className="text-gray-400 text-sm">Извлечённый текст появится здесь</p>
+                                        <p className="text-gray-400 text-sm">Изображение не выбрано</p>
                                     </div>
+                                )}
+                            </div>
+                            <div className="flex justify-between items-end mt-4 -mx-2 -mb-2">
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                                        className="flex items-center justify-center px-3 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-md transition-colors text-white"
+                                    >
+                                        <ChevronLeft className={`w-4 h-4 transition-transform ${isSidebarOpen ? '' : 'rotate-180'}`} />
+                                    </button>
+                                    <button className="flex items-center px-3 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-md transition-colors text-white text-sm">
+                                        <FolderOpen className="w-4 h-4 mr-2" />
+                                        Открыть файл(ы)
+                                    </button>
                                 </div>
-                            )}
+                                <button className="flex items-center px-3 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-md transition-colors text-white text-sm">
+                                    <Clipboard className="w-4 h-4 mr-2" />
+                                    Вставить
+                                </button>
+                            </div>
                         </div>
-                        <div className="flex justify-between mt-4 -mx-2 -mb-2">
-                            <button className="flex items-center px-3 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-lg transition-colors text-white text-sm">
-                                <Share className="w-4 h-4 mr-2" />
-                                Поделится
-                            </button>
-                            <button className="flex items-center px-3 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-lg transition-colors text-white text-sm">
-                                <Copy className="w-4 h-4 mr-2" />
-                                Копировать
-                            </button>
+
+                        {/* Область для текста */}
+                        <div className="flex-1 bg-[#3a3a3a] backdrop-blur-sm rounded-xl border border-gray-700/30 flex flex-col p-4">
+                            <div className="flex-1 overflow-auto">
+                                {extractedText ? (
+                                    <div className="text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">
+                                        {extractedText}
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center justify-center h-full text-center opacity-50">
+                                        <div>
+                                            <div className="w-12 h-12 bg-gray-600 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                                <Copy className="w-6 h-6 text-gray-400" />
+                                            </div>
+                                            <p className="text-gray-400 text-sm">Извлечённый текст появится здесь</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex justify-between mt-4 -mx-2 -mb-2">
+                                <button className="flex items-center px-3 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-lg transition-colors text-white text-sm">
+                                    <Share className="w-4 h-4 mr-2" />
+                                    Поделится
+                                </button>
+                                <button className="flex items-center px-3 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-lg transition-colors text-white text-sm">
+                                    <Copy className="w-4 h-4 mr-2" />
+                                    Копировать
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
