@@ -6,10 +6,10 @@ let pyShell;
 
 function createWindow() {
     const win = new BrowserWindow({
-        width: 1300,
-        height: 800,
-        minWidth: 800,
-        minHeight: 600,
+        width: 1450,
+        height: 825,
+        minWidth: 1100,
+        minHeight: 700,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js')
         },

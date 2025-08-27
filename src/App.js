@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, Trash2, FolderOpen, Copy, Share, Clipboard, Settings, Image } from 'lucide-react';
+import { Menu, Trash2, FolderOpen, Copy, Share, Clipboard, Settings, Image, ChevronLeft } from 'lucide-react';
 
 export default function ImageToTextApp() {
     const [selectedImage, setSelectedImage] = useState(null);
     const [extractedText, setExtractedText] = useState('');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [history, setHistory] = useState([]);
 
     // загрузка истории при запуске
@@ -88,7 +89,7 @@ export default function ImageToTextApp() {
                     </div>
                 </div>
 
-                <div className="w-72 bg-gray-800/40 backdrop-blur-sm rounded-2xl border border-gray-700/30 flex flex-col">
+                <div className={`bg-gray-800/40 backdrop-blur-sm rounded-2xl border border-gray-700/30 flex flex-col transition-all duration-300 ${isSidebarOpen ? 'w-72' : 'w-0 overflow-hidden opacity-0'}`}>
                     {/* Выбранные файлы */}
                     <div className="px-4 pb-4 pt-4">
                         <h3 className="text-white font-medium text-sm mb-3">Выбранные файлы</h3>
@@ -179,11 +180,19 @@ export default function ImageToTextApp() {
                                 </div>
                             )}
                         </div>
-                        <div className="flex justify-between mt-4 -mx-2 -mb-2">
-                            <button className="flex items-center px-4 py-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-md transition-colors text-white text-sm">
-                                <FolderOpen className="w-4 h-4 mr-2" />
-                                Открыть файл(ы)
-                            </button>
+                        <div className="flex justify-between items-end mt-4 -mx-2 -mb-2">
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                                    className="flex items-center justify-center px-4 py-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-md transition-colors text-white"
+                                >
+                                    <ChevronLeft className={`w-4 h-4 transition-transform ${isSidebarOpen ? '' : 'rotate-180'}`} />
+                                </button>
+                                <button className="flex items-center px-4 py-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-md transition-colors text-white text-sm">
+                                    <FolderOpen className="w-4 h-4 mr-2" />
+                                    Открыть файл(ы)
+                                </button>
+                            </div>
                             <button className="flex items-center px-4 py-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-md transition-colors text-white text-sm">
                                 <Clipboard className="w-4 h-4 mr-2" />
                                 Вставить
