@@ -84,7 +84,7 @@ export default function ImageToTextApp() {
     return (
         <div className="h-screen bg-gradient-to-br bg-[#2b2b2b] flex flex-col">
             {/* напишем кастомный заголовок для приложения так как мне не нравится изменение цвета заголовка windows  */}
-            <div className="bg-[#2b2b2b] border-b border-gray-700/30 flex items-stretch justify-between h-8" style={{"-webkit-app-region": "drag"}}>
+            <div className="bg-[#2b2b2b] flex items-stretch justify-between h-8" style={{"-webkit-app-region": "drag"}}>
                 <div className="text-white text-sm font-medium px-4 flex items-center h-full">TNS Reader</div>
                                 <div className="flex h-full" style={{"-webkit-app-region": "no-drag"}}>
                     {/* кнопка сворачивания */}
@@ -116,26 +116,32 @@ export default function ImageToTextApp() {
 
                 </div>
             </div>
-            <div className="flex flex-1 p-2 gap-2">
+            <div className="flex flex-1 gap-2">
                 {/* Боковая панель меню */}
-                <div className={`bg-[#2b2b2b] backdrop-blur-sm rounded-2xl border border-gray-700/30 flex flex-col transition-all duration-300 overflow-hidden ${isMenuOpen ? 'w-72' : 'w-8'}`}>
+                <div className={`bg-[#2b2b2b] backdrop-blur-sm flex flex-col transition-all duration-300 overflow-hidden ${isMenuOpen ? 'w-72' : 'w-11'}`}>
+
                     {/* Иконка меню */}
-                    <div className={`flex items-center p-4 ${isMenuOpen ? '' : 'justify-center'}`}>
-                        <Menu
-                            className="w-5 h-5 text-gray-300 cursor-pointer hover:text-white flex-shrink-0"
+                    <div className="flex items-center h-12 w-full">
+                        <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        />
-                        {isMenuOpen && <span className="ml-2 text-white text-sm">Меню</span>}
+                            className="flex items-center w-full h-full px-4 justify-start gap-2"
+                        >
+                            <Menu className="w-5 h-5 text-gray-300 hover:text-white flex-shrink-0" />
+                            {isMenuOpen && <span className="text-white text-sm">Меню</span>}
+                        </button>
                     </div>
 
-                    <div className={`flex items-center p-4 ${isMenuOpen ? '' : 'justify-center'} mt-auto`}>
-                        <Settings className="w-4 h-4 text-gray-400 cursor-pointer hover:text-white flex-shrink-0" />
-                        {isMenuOpen && <span className="ml-2 text-white text-sm">Настройки</span>}
+                    <div className="flex items-center h-12 mt-auto w-full">
+                        <button className="flex items-center w-full h-full px-4 justify-start gap-2">
+                            <Settings className="w-4 h-4 text-gray-400 hover:text-white flex-shrink-0" />
+                            {isMenuOpen && <span className="text-white text-sm">Настройки</span>}
+                        </button>
                     </div>
+
                 </div>
 
                 {/* Основная рабочая область */}
-                <div className="flex-1 bg-[#303030] rounded-2xl border border-gray-700/30 p-8">
+                <div className="flex-1 bg-[#303030] rounded-l-2xl border border-gray-700/30 mt-3 p-8">
                     <div className="flex flex-row gap-2 h-full">
                         {/* Область файлов */}
                         <div className={`bg-[#3a3a3a] backdrop-blur-sm rounded-xl border border-gray-700/30 flex flex-col transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-0 overflow-hidden opacity-0'}`}>
