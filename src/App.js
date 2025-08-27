@@ -7,6 +7,7 @@ export default function ImageToTextApp() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [history, setHistory] = useState([]);
+    const [isTextAreaFocused, setIsTextAreaFocused] = useState(false);
 
     // загрузка истории при запуске
     useEffect(() => {
@@ -62,8 +63,59 @@ export default function ImageToTextApp() {
         setExtractedText('some text');
     };
 
+    const handleMinimize = () => {
+        if (window.electronAPI) {
+            window.electronAPI.minimize();
+        }
+    };
+
+    const handleMaximize = () => {
+        if (window.electronAPI) {
+            window.electronAPI.maximize();
+        }
+    };
+
+    const handleClose = () => {
+        if (window.electronAPI) {
+            window.electronAPI.close();
+        }
+    };
+
     return (
         <div className="h-screen bg-gradient-to-br bg-[#2b2b2b] flex flex-col">
+            {/* напишем кастомный заголовок для приложения так как мне не нравится изменение цвета заголовка windows  */}
+            <div className="bg-[#2b2b2b] border-b border-gray-700/30 flex items-stretch justify-between h-8" style={{"-webkit-app-region": "drag"}}>
+                <div className="text-white text-sm font-medium px-4 flex items-center h-full">TNS Reader</div>
+                                <div className="flex h-full" style={{"-webkit-app-region": "no-drag"}}>
+                    {/* кнопка сворачивания */}
+                    <button
+                        onClick={handleMinimize}
+                        className="w-12 flex-1 flex items-center justify-center hover:bg-gray-600/50 transition-colors"
+                    >
+                        <div className="w-3 h-px bg-white"></div>
+                    </button>
+                    {/* кнопка разворачивания */}
+                    <button
+                        onClick={handleMaximize}
+                        className="w-12 flex-1 flex items-center justify-center hover:bg-gray-600/50 transition-colors"
+                    >
+                        <div className="w-2.5 h-2.5 border-[1.5px] border-white rounded-sm"></div>
+                    </button>
+                    {/* кнопка закрытия */}
+                    <button
+                        onClick={handleClose}
+                        className="w-12 flex-1 flex items-center justify-center hover:bg-red-600 transition-colors"
+                    >
+                        <div className="w-3 h-3 relative">
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-3 h-px bg-white rotate-45"></div>
+                                <div className="w-3 h-px bg-white -rotate-45 absolute"></div>
+                            </div>
+                        </div>
+                    </button>
+
+                </div>
+            </div>
             <div className="flex flex-1 p-2 gap-2">
                 {/* Боковая панель меню */}
                 <div className={`bg-[#2b2b2b] backdrop-blur-sm rounded-2xl border border-gray-700/30 flex flex-col transition-all duration-300 overflow-hidden ${isMenuOpen ? 'w-72' : 'w-8'}`}>
@@ -100,9 +152,9 @@ export default function ImageToTextApp() {
                                     />
                                     <label
                                         htmlFor="file-upload"
-                                        className="cursor-pointer block hover:bg-gray-600/20 p-3 rounded-lg transition-colors"
+                                        className="cursor-pointer block hover:bg-gray-700/30 p-3 rounded-lg transition-colors"
                                     >
-                                        <div className="text-gray-500 text-xs">Перетащите файлы сюда или нажмите чтобы выбрать</div>
+                                        <div className="text-gray-300 text-xs">Перетащите файлы сюда или нажмите чтобы выбрать</div>
                                     </label>
                                 </div>
                             </div>
@@ -167,10 +219,10 @@ export default function ImageToTextApp() {
                                     />
                                 ) : (
                                     <div className="text-center opacity-50">
-                                        <div className="w-20 h-20 bg-gray-600 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                        <div className="w-20 h-20 bg-[#404040] rounded-lg flex items-center justify-center mx-auto mb-3">
                                             <Image className="w-10 h-10 text-gray-400" />
                                         </div>
-                                        <p className="text-gray-400 text-sm">Изображение не выбрано</p>
+                                        <p className="text-gray-300 text-sm">Изображение не выбрано</p>
                                     </div>
                                 )}
                             </div>
@@ -196,18 +248,24 @@ export default function ImageToTextApp() {
 
                         {/* Область для текста */}
                         <div className="flex-1 bg-[#3a3a3a] backdrop-blur-sm rounded-xl border border-gray-700/30 flex flex-col p-4">
-                            <div className="flex-1 overflow-auto">
-                                {extractedText ? (
-                                    <div className="text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">
-                                        {extractedText}
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center justify-center h-full text-center opacity-50">
+                            <div className="flex-1 overflow-hidden relative">
+                                <textarea
+                                    value={extractedText}
+                                    onChange={(e) => setExtractedText(e.target.value)}
+                                    onFocus={() => setIsTextAreaFocused(true)}
+                                    onBlur={() => setIsTextAreaFocused(false)}
+                                    placeholder=""
+                                    className={`w-full h-full resize-none outline-none text-gray-200 text-sm leading-relaxed rounded-sm transition-colors p-3 ${
+                                        isTextAreaFocused ? 'bg-[#272727]' : 'bg-[#464646]'
+                                    }`}
+                                />
+                                {!extractedText && !isTextAreaFocused && (
+                                    <div className="absolute inset-0 flex items-center justify-center text-center opacity-50 pointer-events-none">
                                         <div>
-                                            <div className="w-12 h-12 bg-gray-600 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                            <div className="w-12 h-12 bg-[#404040] rounded-lg flex items-center justify-center mx-auto mb-3">
                                                 <Copy className="w-6 h-6 text-gray-400" />
                                             </div>
-                                            <p className="text-gray-400 text-sm">Извлечённый текст появится здесь</p>
+                                            <p className="text-gray-300 text-sm">Извлечённый текст появится здесь</p>
                                         </div>
                                     </div>
                                 )}
