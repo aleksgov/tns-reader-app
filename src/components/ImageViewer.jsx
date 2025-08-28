@@ -4,7 +4,8 @@ import { FolderOpen, Clipboard, Image, ChevronLeft } from 'lucide-react';
 export default function ImageViewer({
                                         selectedImage,
                                         isSidebarOpen,
-                                        setIsSidebarOpen
+                                        setIsSidebarOpen,
+                                        handleOpenFiles
                                     }) {
     return (
         <div className="flex-1 rounded-xl border bg-[#3a3a3a] border-gray-700/30 flex flex-col p-4">
@@ -32,10 +33,21 @@ export default function ImageViewer({
                     >
                         <ChevronLeft className={`w-4 h-4 transition-transform ${isSidebarOpen ? '' : 'rotate-180'}`} />
                     </button>
-                    <button className="flex items-center px-3 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-md transition-colors text-white text-sm">
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleOpenFiles}
+                        className="hidden"
+                        id="open-files"
+                        multiple
+                    />
+                    <label
+                        htmlFor="open-files"
+                        className="flex items-center px-3 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-md transition-colors text-white text-sm cursor-pointer"
+                    >
                         <FolderOpen className="w-4 h-4 mr-2" />
                         Открыть файл(ы)
-                    </button>
+                    </label>
                 </div>
                 <button className="flex items-center px-3 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-md transition-colors text-white text-sm">
                     <Clipboard className="w-4 h-4 mr-2" />

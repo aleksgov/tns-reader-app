@@ -11,6 +11,7 @@ export default function App() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [history, setHistory] = useState([]);
+    const [openFiles, setOpenFiles] = useState([]);
     const [isTextAreaFocused, setIsTextAreaFocused] = useState(false);
 
     // Загрузка истории при запуске
@@ -32,13 +33,17 @@ export default function App() {
         setHistory([]);
     };
 
+    const handleDeleteOpenFile = (id) => {
+        setOpenFiles(openFiles.filter(file => file.id !== id));
+    };
+
     const addToHistory = (file, imageData) => {
         const now = new Date();
         const dateStr = now.toLocaleDateString('ru-RU') + ' ' + now.toLocaleTimeString('ru-RU');
         const fileType = file.name.split('.').pop().toLowerCase();
 
         const historyItem = {
-            id: Date.now(),
+            id: Date.now() + Math.random(), // Делаем ID более уникальным
             name: file.name,
             date: dateStr,
             type: fileType,
@@ -46,6 +51,19 @@ export default function App() {
         };
 
         setHistory(prev => [historyItem, ...prev]);
+    };
+
+    const addToOpenFiles = (file, imageData) => {
+        const fileType = file.name.split('.').pop().toLowerCase();
+
+        const openFileItem = {
+            id: Date.now() + Math.random(), // Делаем ID более уникальным
+            name: file.name,
+            type: fileType,
+            imageData: imageData
+        };
+
+        setOpenFiles(prev => [openFileItem, ...prev]);
     };
 
     const handleFileUpload = (event) => {
@@ -56,14 +74,45 @@ export default function App() {
                 const imageData = e.target.result;
                 setSelectedImage(imageData);
                 setExtractedText('some text');
+
+                // Добавляем в оба списка
                 addToHistory(file, imageData);
+                addToOpenFiles(file, imageData);
             };
             reader.readAsDataURL(file);
         }
     };
 
+    const handleOpenFiles = (event) => {
+        const files = event.target.files;
+        if (files && files.length > 0) {
+            Array.from(files).forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imageData = e.target.result;
+
+                    if (index === 0) {
+                        setSelectedImage(imageData);
+                        setExtractedText('some text');
+                    }
+                    setTimeout(() => {
+                        addToHistory(file, imageData);
+                        addToOpenFiles(file, imageData);
+                    }, index * 10);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        event.target.value = '';
+    };
+
     const handleHistoryFileClick = (historyItem) => {
         setSelectedImage(historyItem.imageData);
+        setExtractedText('some text');
+    };
+
+    const handleOpenFileClick = (openFileItem) => {
+        setSelectedImage(openFileItem.imageData);
         setExtractedText('some text');
     };
 
@@ -82,6 +131,9 @@ export default function App() {
                         <FilePanel
                             isSidebarOpen={isSidebarOpen}
                             handleFileUpload={handleFileUpload}
+                            openFiles={openFiles}
+                            handleOpenFileClick={handleOpenFileClick}
+                            handleDeleteOpenFile={handleDeleteOpenFile}
                             history={history}
                             handleHistoryFileClick={handleHistoryFileClick}
                             handleDeleteFile={handleDeleteFile}
@@ -92,6 +144,7 @@ export default function App() {
                             selectedImage={selectedImage}
                             isSidebarOpen={isSidebarOpen}
                             setIsSidebarOpen={setIsSidebarOpen}
+                            handleOpenFiles={handleOpenFiles}
                         />
 
                         <TextArea
