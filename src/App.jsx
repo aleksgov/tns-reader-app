@@ -37,14 +37,22 @@ export default function App() {
         setOpenFiles(openFiles.filter(file => file.id !== id));
     };
 
-    const addToHistory = (file, imageData) => {
+    const addToHistory = (file, imageData, fileName = null) => {
         const now = new Date();
         const dateStr = now.toLocaleDateString('ru-RU') + ' ' + now.toLocaleTimeString('ru-RU');
-        const fileType = file.name.split('.').pop().toLowerCase();
+
+        let fileType, name;
+        if (file) {
+            fileType = file.name.split('.').pop().toLowerCase();
+            name = file.name;
+        } else {
+            name = fileName || 'Вставленное изображение';
+            fileType = 'png'; // формат для вставленных изображений
+        }
 
         const historyItem = {
-            id: Date.now() + Math.random(), // Делаем ID более уникальным
-            name: file.name,
+            id: Date.now() + Math.random(),
+            name: name,
             date: dateStr,
             type: fileType,
             imageData: imageData
@@ -53,12 +61,19 @@ export default function App() {
         setHistory(prev => [historyItem, ...prev]);
     };
 
-    const addToOpenFiles = (file, imageData) => {
-        const fileType = file.name.split('.').pop().toLowerCase();
+    const addToOpenFiles = (file, imageData, fileName = null) => {
+        let fileType, name;
+        if (file) {
+            fileType = file.name.split('.').pop().toLowerCase();
+            name = file.name;
+        } else {
+            name = fileName || 'Вставленное изображение';
+            fileType = 'png';
+        }
 
         const openFileItem = {
-            id: Date.now() + Math.random(), // Делаем ID более уникальным
-            name: file.name,
+            id: Date.now() + Math.random(),
+            name: name,
             type: fileType,
             imageData: imageData
         };
@@ -106,6 +121,43 @@ export default function App() {
         event.target.value = '';
     };
 
+    const handlePasteImage = async () => {
+        try {
+            const clipboardItems = await navigator.clipboard.read();
+
+            for (const clipboardItem of clipboardItems) {
+                for (const type of clipboardItem.types) {
+                    if (type.startsWith('image/')) {
+                        const blob = await clipboardItem.getType(type);
+
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const imageData = e.target.result;
+
+                            const now = new Date();
+                            const timestamp = now.toLocaleTimeString('ru-RU').replace(/:/g, '-');
+                            const fileName = `Скриншот ${timestamp}`;
+
+                            setSelectedImage(imageData);
+                            setExtractedText('some text');
+
+                            addToHistory(null, imageData, fileName);
+                            addToOpenFiles(null, imageData, fileName);
+                        };
+                        reader.readAsDataURL(blob);
+                        return;
+                    }
+                }
+            }
+
+            alert('В буфере обмена нет изображений');
+
+        } catch (error) {
+            console.error('Ошибка при вставке изображения:', error);
+            alert('Не удалось получить изображение из буфера обмена');
+        }
+    };
+
     const handleHistoryFileClick = (historyItem) => {
         setSelectedImage(historyItem.imageData);
         setExtractedText('some text');
@@ -145,6 +197,7 @@ export default function App() {
                             isSidebarOpen={isSidebarOpen}
                             setIsSidebarOpen={setIsSidebarOpen}
                             handleOpenFiles={handleOpenFiles}
+                            handlePasteImage={handlePasteImage}
                         />
 
                         <TextArea
