@@ -1,5 +1,5 @@
 import React from 'react';
-import { Share, Copy } from 'lucide-react';
+import { Download, Copy } from 'lucide-react';
 
 export default function TextArea({
                                      extractedText,
@@ -32,9 +32,11 @@ export default function TextArea({
                 )}
             </div>
             <div className="flex justify-between mt-4 -mx-2 -mb-2">
-                <button className="flex items-center px-3 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-lg transition-colors text-white text-sm">
-                    <Share className="w-4 h-4 mr-2" />
-                    Поделится
+                <button
+                    className="flex items-center px-3 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-lg transition-colors text-white text-sm"
+                >
+                    <Download className="w-4 h-4 mr-2" />
+                    Экспортировать
                 </button>
                 <button className="flex items-center px-3 py-2 bg-[#464646] hover:bg-[#4b4b4b] rounded-lg transition-colors text-white text-sm">
                     <Copy className="w-4 h-4 mr-2" />
