@@ -4,6 +4,7 @@ import Sidebar from './components/Sidebar';
 import FilePanel from './components/FilePanel';
 import ImageViewer from './components/ImageViewer';
 import TextArea from './components/TextArea';
+import { recognizeText, recognizeTextFromBase64 } from './utils/ocrService';
 
 export default function App() {
     const [selectedImage, setSelectedImage] = useState(null);
@@ -13,6 +14,8 @@ export default function App() {
     const [history, setHistory] = useState([]);
     const [openFiles, setOpenFiles] = useState([]);
     const [isTextAreaFocused, setIsTextAreaFocused] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [ocrError, setOcrError] = useState(null);
 
     // Загрузка истории при запуске
     useEffect(() => {
@@ -37,7 +40,33 @@ export default function App() {
         setOpenFiles(openFiles.filter(file => file.id !== id));
     };
 
-    const addToHistory = (file, imageData, fileName = null) => {
+    // Функция для распознавания текста
+    const processImageWithOCR = async (file, imageData) => {
+        setIsProcessing(true);
+        setOcrError(null);
+        setExtractedText('Распознавание текста...');
+
+        try {
+            let recognizedText;
+            if (file) {
+                recognizedText = await recognizeText(file);
+            } else {
+                recognizedText = await recognizeTextFromBase64(imageData);
+            }
+
+            setExtractedText(recognizedText || 'Текст не найден');
+            return recognizedText;
+        } catch (error) {
+            console.error('Ошибка OCR:', error);
+            setOcrError('Ошибка при распознавании текста. Проверьте подключение к серверу.');
+            setExtractedText('Ошибка распознавания');
+            return 'Ошибка распознавания';
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
+    const addToHistory = (file, imageData, fileName = null, extractedText = '') => {
         const now = new Date();
         const dateStr = now.toLocaleDateString('ru-RU') + ' ' + now.toLocaleTimeString('ru-RU');
 
@@ -47,7 +76,7 @@ export default function App() {
             name = file.name;
         } else {
             name = fileName || 'Вставленное изображение';
-            fileType = 'png'; // формат для вставленных изображений
+            fileType = 'png';
         }
 
         const historyItem = {
@@ -55,13 +84,14 @@ export default function App() {
             name: name,
             date: dateStr,
             type: fileType,
-            imageData: imageData
+            imageData: imageData,
+            extractedText: extractedText
         };
 
         setHistory(prev => [historyItem, ...prev]);
     };
 
-    const addToOpenFiles = (file, imageData, fileName = null) => {
+    const addToOpenFiles = (file, imageData, fileName = null, extractedText = '') => {
         let fileType, name;
         if (file) {
             fileType = file.name.split('.').pop().toLowerCase();
@@ -75,48 +105,57 @@ export default function App() {
             id: Date.now() + Math.random(),
             name: name,
             type: fileType,
-            imageData: imageData
+            imageData: imageData,
+            extractedText: extractedText
         };
 
         setOpenFiles(prev => [openFileItem, ...prev]);
     };
 
-    const handleFileUpload = (event) => {
+    const handleFileUpload = async (event) => {
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = async (e) => {
                 const imageData = e.target.result;
                 setSelectedImage(imageData);
-                setExtractedText('some text');
+
+                const recognizedText = await processImageWithOCR(file, imageData);
 
                 // Добавляем в оба списка
-                addToHistory(file, imageData);
-                addToOpenFiles(file, imageData);
+                addToHistory(file, imageData, null, recognizedText);
+                addToOpenFiles(file, imageData, null, recognizedText);
             };
             reader.readAsDataURL(file);
         }
     };
 
-    const handleOpenFiles = (event) => {
+    const handleOpenFiles = async (event) => {
         const files = event.target.files;
         if (files && files.length > 0) {
-            Array.from(files).forEach((file, index) => {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
                 const reader = new FileReader();
-                reader.onload = (e) => {
+
+                reader.onload = async (e) => {
                     const imageData = e.target.result;
 
-                    if (index === 0) {
+                    if (i === 0) {
                         setSelectedImage(imageData);
-                        setExtractedText('some text');
+                        // Распознаём текст только для первого изображения
+                        const recognizedText = await processImageWithOCR(file, imageData);
+                        addToHistory(file, imageData, null, recognizedText);
+                        addToOpenFiles(file, imageData, null, recognizedText);
+                    } else {
+                        // Для остальных изображений добавляем без распознавания
+                        setTimeout(() => {
+                            addToHistory(file, imageData, null, '');
+                            addToOpenFiles(file, imageData, null, '');
+                        }, i * 10);
                     }
-                    setTimeout(() => {
-                        addToHistory(file, imageData);
-                        addToOpenFiles(file, imageData);
-                    }, index * 10);
                 };
                 reader.readAsDataURL(file);
-            });
+            }
         }
         event.target.value = '';
     };
@@ -131,7 +170,7 @@ export default function App() {
                         const blob = await clipboardItem.getType(type);
 
                         const reader = new FileReader();
-                        reader.onload = (e) => {
+                        reader.onload = async (e) => {
                             const imageData = e.target.result;
 
                             const now = new Date();
@@ -139,10 +178,11 @@ export default function App() {
                             const fileName = `Скриншот ${timestamp}`;
 
                             setSelectedImage(imageData);
-                            setExtractedText('some text');
 
-                            addToHistory(null, imageData, fileName);
-                            addToOpenFiles(null, imageData, fileName);
+                            const recognizedText = await processImageWithOCR(null, imageData);
+
+                            addToHistory(null, imageData, fileName, recognizedText);
+                            addToOpenFiles(null, imageData, fileName, recognizedText);
                         };
                         reader.readAsDataURL(blob);
                         return;
@@ -160,12 +200,19 @@ export default function App() {
 
     const handleHistoryFileClick = (historyItem) => {
         setSelectedImage(historyItem.imageData);
-        setExtractedText('some text');
+        setExtractedText(historyItem.extractedText || 'Текст не сохранён');
+        setOcrError(null);
     };
 
-    const handleOpenFileClick = (openFileItem) => {
+    const handleOpenFileClick = async (openFileItem) => {
         setSelectedImage(openFileItem.imageData);
-        setExtractedText('some text');
+
+        if (openFileItem.extractedText) {
+            setExtractedText(openFileItem.extractedText);
+        } else {
+            await processImageWithOCR(null, openFileItem.imageData);
+        }
+        setOcrError(null);
     };
 
     return (
@@ -205,6 +252,8 @@ export default function App() {
                             setExtractedText={setExtractedText}
                             isTextAreaFocused={isTextAreaFocused}
                             setIsTextAreaFocused={setIsTextAreaFocused}
+                            isProcessing={isProcessing}
+                            ocrError={ocrError}
                         />
                     </div>
                 </div>
