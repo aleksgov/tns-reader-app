@@ -18,8 +18,10 @@
   "scripts": {
     "start": "cross-env BROWSER=none react-scripts start",
     "build": "react-scripts build",
-    "dev:electron": "wait-on http://localhost:3000 && electron .",
-    "dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && npm run dev:electron\""
+    "electron": "wait-on http://localhost:3000 && electron .",
+    "flask": "powershell -ExecutionPolicy Bypass -File ./run-backend.ps1",
+    "frontend": "concurrently \"npm start\" \"wait-on http://localhost:3000 && npm run dev:electron\"",
+    "dev": "concurrently \"npm run dev:flask\" \"npm run dev\""
   },
   "eslintConfig": {
     "extends": [
