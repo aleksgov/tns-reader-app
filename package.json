@@ -11,17 +11,16 @@
     "python-shell": "^5.0.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-markdown": "^10.1.0",
     "react-scripts": "5.0.1",
+    "rehype-raw": "^7.0.0",
     "web-vitals": "^2.1.4"
   },
   "main": "electron/main.cjs",
   "scripts": {
     "start": "cross-env BROWSER=none react-scripts start",
-    "build": "react-scripts build",
     "electron": "wait-on http://localhost:3000 && electron .",
-    "flask": "powershell -ExecutionPolicy Bypass -File ./run-backend.ps1",
-    "frontend": "concurrently \"npm start\" \"wait-on http://localhost:3000 && npm run dev:electron\"",
-    "dev": "concurrently \"npm run dev:flask\" \"npm run dev\""
+    "dev": "concurrently -k \"npm start\" \"wait-on http://localhost:3000 && electron .\""
   },
   "eslintConfig": {
     "extends": [

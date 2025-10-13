@@ -2,5 +2,8 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/backend/PaddleX" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/backend/PaddleX/paddlex/repo_manager/repos/PaddleNLP" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/backend/PaddleX/paddlex/repo_manager/repos/PaddleOCR" vcs="Git" />
   </component>
 </project>

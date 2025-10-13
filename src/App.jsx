@@ -4,7 +4,7 @@ import Sidebar from './components/Sidebar';
 import FilePanel from './components/FilePanel';
 import ImageViewer from './components/ImageViewer';
 import TextArea from './components/TextArea';
-import { recognizeText, recognizeTextFromBase64 } from './utils/ocrService';
+import { recognizeText } from './utils/ocrService';
 
 export default function App() {
     const [selectedImage, setSelectedImage] = useState(null);
@@ -50,8 +50,12 @@ export default function App() {
             let recognizedText;
             if (file) {
                 recognizedText = await recognizeText(file);
-            } else {
-                recognizedText = await recognizeTextFromBase64(imageData);
+            } else if (imageData) {
+                // base64 -> Blob
+                const res = await fetch(imageData);
+                const blob = await res.blob();
+                const tempFile = new File([blob], "clipboard.png", { type: blob.type });
+                recognizedText = await recognizeText(tempFile);
             }
 
             setExtractedText(recognizedText || 'Текст не найден');

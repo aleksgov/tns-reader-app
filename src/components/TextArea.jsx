@@ -1,5 +1,8 @@
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 import { Download, Copy, AlertCircle, Loader2 } from 'lucide-react';
+import './markdown-styles.css';
 
 export default function TextArea({
                                      extractedText,
@@ -18,42 +21,19 @@ export default function TextArea({
 
     const handleExport = () => {
         if (extractedText && extractedText !== 'Распознавание текста...') {
-            const blob = new Blob([extractedText], { type: 'text/plain' });
+            const blob = new Blob([extractedText], { type: 'text/markdown' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `extracted_text_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+            a.download = `extracted_text_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.md`;
             a.click();
             URL.revokeObjectURL(url);
         }
     };
 
     return (
-        <div className="flex-1 bg-[#3a3a3a] backdrop-blur-sm rounded-xl border border-gray-700/30 flex flex-col p-4">
-            <div className="flex-1 overflow-hidden relative">
-                <textarea
-                    value={extractedText}
-                    onChange={(e) => setExtractedText(e.target.value)}
-                    onFocus={() => setIsTextAreaFocused(true)}
-                    onBlur={() => setIsTextAreaFocused(false)}
-                    placeholder=""
-                    disabled={isProcessing}
-                    className={`w-full h-full resize-none outline-none text-gray-200 text-sm leading-relaxed rounded-sm transition-colors p-3 ${
-                        isTextAreaFocused ? 'bg-[#272727]' : 'bg-[#464646]'
-                    } ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
-                />
-
-                {!extractedText && !isTextAreaFocused && !isProcessing && !ocrError && (
-                    <div className="absolute inset-0 flex items-center justify-center text-center opacity-50 pointer-events-none">
-                        <div>
-                            <div className="w-12 h-12 bg-[#404040] rounded-lg flex items-center justify-center mx-auto mb-3">
-                                <Copy className="w-6 h-6 text-gray-400" />
-                            </div>
-                            <p className="text-gray-300 text-sm">Извлечённый текст появится здесь</p>
-                        </div>
-                    </div>
-                )}
-
+        <div className="flex-1 bg-[#3a3a3a] backdrop-blur-sm rounded-xl border border-gray-700/30 flex flex-col p-4 max-h-[90vh]">
+            <div className="flex-1 overflow-auto relative p-3">
                 {isProcessing && (
                     <div className="absolute inset-0 flex items-center justify-center text-center pointer-events-none">
                         <div>
@@ -75,6 +55,14 @@ export default function TextArea({
                                 {ocrError}
                             </p>
                         </div>
+                    </div>
+                )}
+
+                {!isProcessing && !ocrError && (
+                    <div className="prose prose-invert max-w-none text-gray-200">
+                        <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                            {extractedText || 'Извлечённый текст появится здесь'}
+                        </ReactMarkdown>
                     </div>
                 )}
             </div>
