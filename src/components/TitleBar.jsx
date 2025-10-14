@@ -20,11 +20,16 @@ export default function TitleBar() {
     };
 
     return (
-        <div className="bg-[#2b2b2b] flex items-stretch justify-between h-8" style={{"-webkit-app-region": "drag"}}>
-            <div className="text-white text-sm font-medium px-4 flex items-center h-full">
+        <div className="bg-[#2b2b2b] flex items-stretch justify-between h-12 mb-0" style={{ "-webkit-app-region": "drag" }}>
+            <div className="text-white text-sm font-medium px-4 mt-2 flex items-center">
+                <img
+                    src="/logo.png"
+                    alt="logo"
+                    className="w-4 h-4 mr-2"
+                />
                 TNS Reader
             </div>
-            <div className="flex h-full" style={{"-webkit-app-region": "no-drag"}}>
+            <div className="flex" style={{"-webkit-app-region": "no-drag"}}>
                 {/* кнопка сворачивания */}
                 <button
                     onClick={handleMinimize}

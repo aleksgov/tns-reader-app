@@ -32,8 +32,8 @@ export default function TextArea({
     };
 
     return (
-        <div className="flex-1 bg-[#3a3a3a] backdrop-blur-sm rounded-xl border border-gray-700/30 flex flex-col p-4 max-h-[90vh]">
-            <div className="flex-1 overflow-auto relative p-3">
+        <div className="flex-1 bg-[#3a3a3a] backdrop-blur-sm rounded-xl border border-gray-700/30 flex flex-col p-4 max-h-[90vh] ">
+            <div className="flex-1 scrollbar-hide overflow-auto relative p-3">
                 {isProcessing && (
                     <div className="absolute inset-0 flex items-center justify-center text-center pointer-events-none">
                         <div>

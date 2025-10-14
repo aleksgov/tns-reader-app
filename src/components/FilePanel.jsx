@@ -108,7 +108,7 @@ export default function FilePanel({
             </div>
 
             {/* Кнопка для удаления всего */}
-            <div className="p-4 border-t border-gray-700/30">
+            <div className="p-4 border-t border-gray-700/30 -mb-2 -mx-2">
                 <button
                     onClick={handleDeleteAll}
                     className="flex items-center justify-center w-full p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-colors text-sm"
