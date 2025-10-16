@@ -27,17 +27,21 @@ git clone https://github.com/aleksgov/tns-reader-app.git
 cd tns-reader-app
 ````
 
-2. Установите зависимости:
+2. Установите зависимости клиентской части:
 
 ```bash
 npm install
 ```
+3. Установите зависимости серверной части
 
+```bash
+.\setup_backend.bat
+```
 ---
 
 ## Запуск в режиме разработки
 
-Для запуска проекта (Python Unicorn + React + Electron):
+Для запуска проекта (Python Uvicorn + React + Electron):
 
 ```bash
 npm run dev
