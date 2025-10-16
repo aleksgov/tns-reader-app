@@ -20,7 +20,7 @@ export default function TitleBar() {
     };
 
     return (
-        <div className="bg-[#2b2b2b] flex items-stretch justify-between h-12 mb-0" style={{ "-webkit-app-region": "drag" }}>
+        <div className="bg-[#2b2b2b] flex items-stretch justify-between h-8 mb-0" style={{ "-webkit-app-region": "drag" }}>
             <div className="text-white text-sm font-medium px-4 mt-2 flex items-center">
                 <img
                     src="/logo.png"

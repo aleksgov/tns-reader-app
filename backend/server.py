@@ -49,3 +49,7 @@ async def ocr_file(file: UploadFile = File(...)):
         "md_content": md_content,
         "md_file": md_filename
     }
+
+@app.api_route("/health", methods=["GET", "HEAD"])
+async def health_check():
+    return {"status": "ok"}

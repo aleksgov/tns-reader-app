@@ -61,7 +61,7 @@ export default function TextArea({
                 {!isProcessing && !ocrError && (
                     <div className="prose prose-invert max-w-none text-gray-200">
                         <ReactMarkdown rehypePlugins={[rehypeRaw]}>
-                            {extractedText || 'Извлечённый текст появится здесь'}
+                            {extractedText}
                         </ReactMarkdown>
                     </div>
                 )}

@@ -19,9 +19,10 @@
   },
   "main": "electron/main.cjs",
   "scripts": {
-    "start": "cross-env BROWSER=none react-scripts start",
+    "backend": "cd backend && uvicorn server:app --reload --port 8000",
+    "frontend": "cross-env BROWSER=none react-scripts start",
     "electron": "wait-on http://localhost:3000 && electron .",
-    "dev": "concurrently -k \"npm start\" \"wait-on http://localhost:3000 && electron .\""
+    "dev": "concurrently -k \"npm run backend\" \"wait-on http://localhost:8000/health && npm run frontend\" \"wait-on http://localhost:3000 && electron .\""
   },
   "eslintConfig": {
     "extends": [
