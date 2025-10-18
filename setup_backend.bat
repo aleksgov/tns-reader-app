@@ -14,8 +14,11 @@ pip install --upgrade pip
 pip install paddlepaddle
 
 REM Paddlex
+git clone https://github.com/PaddlePaddle/PaddleX.git
 cd PaddleX
 pip install -e ".[ocr]"
+pip install "uvicorn[standard]"
+pip install fastapi
 
 echo Installation complete!
 pause
