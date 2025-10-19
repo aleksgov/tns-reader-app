@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import { Download, Copy, AlertCircle, Loader2, FileText, Eye } from 'lucide-react';
+import { saveAs } from 'file-saver';
+import htmlDocx from 'html-docx-js/dist/html-docx';
+import { marked } from 'marked';
 import './markdown-styles.css';
 
 export default function TextArea({
@@ -22,31 +25,45 @@ export default function TextArea({
     };
 
     const handleExportMarkdown = () => {
-        if (extractedText && extractedText !== 'Распознавание текста...') {
-            const blob = new Blob([extractedText], { type: 'text/markdown' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `extracted_text_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.md`;
-            a.click();
-            URL.revokeObjectURL(url);
-            setShowExportMenu(false);
-        }
-    };
-
-    const handleExportDocx = () => {
-        // Заглушка для будущей реализации
-        alert('Экспорт в DOCX будет реализован позже');
+        if (!extractedText || extractedText === 'Распознавание текста...') return;
+        const blob = new Blob([extractedText], { type: 'text/markdown;charset=utf-8' });
+        const fileName = `extracted_text_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.md`;
+        saveAs(blob, fileName);
         setShowExportMenu(false);
     };
 
-    const handleTextChange = (e) => {
-        setExtractedText(e.target.value);
+   const handleExportDocx = () => {
+        if (!extractedText || extractedText === 'Распознавание текста...') return;
+
+        // Конвертируем Markdown в HTML
+        const htmlBody = marked(extractedText);
+
+        const htmlContent = `
+            <html>
+            <head>
+                <meta charset="utf-8"/>
+                <style>
+                    body { font-family: Arial, sans-serif; font-size: 12pt; color: #000; }
+                    table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+                    td, th { border: 1px solid #000; padding: 4px; }
+                    div, p { margin: 6px 0; }
+                    h1, h2, h3 { color: #222; }
+                </style>
+            </head>
+            <body>
+                ${htmlBody}
+            </body>
+            </html>
+        `;
+
+        const blob = htmlDocx.asBlob(htmlContent);
+        const fileName = `extracted_text_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.docx`;
+        saveAs(blob, fileName);
+        setShowExportMenu(false);
     };
 
-    const toggleMode = () => {
-        setIsMarkdownMode(!isMarkdownMode);
-    };
+    const handleTextChange = (e) => setExtractedText(e.target.value);
+    const toggleMode = () => setIsMarkdownMode(!isMarkdownMode);
 
     return (
         <div className="flex-1 bg-[#3a3a3a] backdrop-blur-sm rounded-xl border border-gray-700/30 flex flex-col p-4 max-h-[90vh]">
@@ -68,9 +85,7 @@ export default function TextArea({
                             <div className="w-12 h-12 bg-red-900/30 rounded-lg flex items-center justify-center mx-auto mb-3">
                                 <AlertCircle className="w-6 h-6 text-red-400" />
                             </div>
-                            <p className="text-red-300 text-sm max-w-xs">
-                                {ocrError}
-                            </p>
+                            <p className="text-red-300 text-sm max-w-xs">{ocrError}</p>
                         </div>
                     </div>
                 )}
@@ -90,11 +105,6 @@ export default function TextArea({
                                 onFocus={() => setIsTextAreaFocused(true)}
                                 onBlur={() => setIsTextAreaFocused(false)}
                                 className="w-full bg-transparent text-gray-200 resize-none focus:outline-none font-mono text-sm min-h-full"
-                                style={{
-                                    scrollbarWidth: 'none',
-                                    msOverflowStyle: 'none',
-                                    height: 'auto'
-                                }}
                                 placeholder="Здесь появится распознанный текст..."
                                 rows={extractedText.split('\n').length || 10}
                             />
@@ -103,6 +113,7 @@ export default function TextArea({
                 )}
             </div>
 
+            {/* Далее уже панель кнопок */}
             <div className="flex justify-between items-center mt-4 -mx-2 -mb-2">
                 <div className="flex gap-2 relative">
                     <div className="relative">
