@@ -3,20 +3,41 @@ import { FolderOpen, Clipboard, Image, ChevronLeft } from 'lucide-react';
 
 export default function ImageViewer({
                                         selectedImage,
+                                        selectedFileType,
+                                        selectedFileName,
                                         isSidebarOpen,
                                         setIsSidebarOpen,
                                         handleOpenFiles,
                                         handlePasteImage
                                     }) {
+    // Определяем PDF по типу или по data URL
+    const isPdf = selectedFileType === 'pdf' || (selectedImage && selectedImage.startsWith('data:application/pdf'));
+
     return (
         <div className="flex-1 rounded-xl border bg-[#3a3a3a] border-gray-700/30 flex flex-col p-4">
             <div className="flex-1 flex items-center justify-center">
                 {selectedImage ? (
-                    <img
-                        src={selectedImage}
-                        alt="Selected"
-                        className="max-w-full max-h-full object-contain rounded-lg"
-                    />
+                    isPdf ? (
+                        <div className="scrollbar-custom w-full h-full overflow-auto rounded-lg">
+                            <object
+                                data={`${selectedImage}#zoom=page-fit`}
+                                type="application/pdf"
+                                className="w-full h-full min-h-[600px]"
+                            >
+                                <iframe
+                                    src={selectedImage}
+                                    title={selectedFileName || 'PDF документ'}
+                                    className="w-full h-full"
+                                />
+                            </object>
+                        </div>
+                    ) : (
+                        <img
+                            src={selectedImage}
+                            alt={selectedFileName || "Selected image"}
+                            className="max-w-full max-h-full object-contain rounded-lg"
+                        />
+                    )
                 ) : (
                     <div className="text-center opacity-50">
                         <div className="w-20 h-20 bg-[#404040] rounded-lg flex items-center justify-center mx-auto mb-3">
@@ -36,7 +57,7 @@ export default function ImageViewer({
                     </button>
                     <input
                         type="file"
-                        accept="image/*"
+                        accept="image/*,application/pdf"
                         onChange={handleOpenFiles}
                         className="hidden"
                         id="open-files"

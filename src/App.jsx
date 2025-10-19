@@ -8,6 +8,8 @@ import { recognizeText } from './utils/ocrService';
 
 export default function App() {
     const [selectedImage, setSelectedImage] = useState(null);
+    const [selectedFileType, setSelectedFileType] = useState(null);
+    const [selectedFileName, setSelectedFileName] = useState(null);
     const [extractedText, setExtractedText] = useState('');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -123,6 +125,9 @@ export default function App() {
             reader.onload = async (e) => {
                 const imageData = e.target.result;
                 setSelectedImage(imageData);
+                const fileType = file.name.split('.').pop().toLowerCase();
+                setSelectedFileType(fileType);
+                setSelectedFileName(file.name);
 
                 const recognizedText = await processImageWithOCR(file, imageData);
 
@@ -132,6 +137,7 @@ export default function App() {
             };
             reader.readAsDataURL(file);
         }
+        event.target.value = '';
     };
 
     const handleOpenFiles = async (event) => {
@@ -143,9 +149,12 @@ export default function App() {
 
                 reader.onload = async (e) => {
                     const imageData = e.target.result;
+                    const fileType = file.name.split('.').pop().toLowerCase();
 
                     if (i === 0) {
                         setSelectedImage(imageData);
+                        setSelectedFileType(fileType);
+                        setSelectedFileName(file.name);
                         // Распознаём текст только для первого изображения
                         const recognizedText = await processImageWithOCR(file, imageData);
                         addToHistory(file, imageData, null, recognizedText);
@@ -180,8 +189,11 @@ export default function App() {
                             const now = new Date();
                             const timestamp = now.toLocaleTimeString('ru-RU').replace(/:/g, '-');
                             const fileName = `Скриншот ${timestamp}`;
+                            const fileType = blob.type.split('/').pop().toLowerCase();
 
                             setSelectedImage(imageData);
+                            setSelectedFileType(fileType);
+                            setSelectedFileName(fileName);
 
                             const recognizedText = await processImageWithOCR(null, imageData);
 
@@ -204,12 +216,16 @@ export default function App() {
 
     const handleHistoryFileClick = (historyItem) => {
         setSelectedImage(historyItem.imageData);
+        setSelectedFileType(historyItem.type);
+        setSelectedFileName(historyItem.name);
         setExtractedText(historyItem.extractedText || 'Текст не сохранён');
         setOcrError(null);
     };
 
     const handleOpenFileClick = async (openFileItem) => {
         setSelectedImage(openFileItem.imageData);
+        setSelectedFileType(openFileItem.type);
+        setSelectedFileName(openFileItem.name);
 
         if (openFileItem.extractedText) {
             setExtractedText(openFileItem.extractedText);
@@ -245,6 +261,8 @@ export default function App() {
 
                         <ImageViewer
                             selectedImage={selectedImage}
+                            selectedFileType={selectedFileType}
+                            selectedFileName={selectedFileName}
                             isSidebarOpen={isSidebarOpen}
                             setIsSidebarOpen={setIsSidebarOpen}
                             handleOpenFiles={handleOpenFiles}

@@ -29,7 +29,7 @@ export default function FilePanel({
                                     <div className={`w-7 h-5 rounded text-xs font-bold flex items-center justify-center mr-3 text-white flex-shrink-0 ${
                                         file.type === 'png' ? 'bg-purple-600' :
                                             file.type === 'jpg' || file.type === 'jpeg' ? 'bg-green-600' :
-                                                'bg-blue-600'
+                                                file.type === 'pdf' ? 'bg-red-600' : 'bg-blue-600'
                                     }`}>
                                         {file.type}
                                     </div>
@@ -53,7 +53,7 @@ export default function FilePanel({
                     <div className="bg-gray-700/30 rounded-xl p-6 border-2 border-dashed border-gray-600/40 text-center">
                         <input
                             type="file"
-                            accept="image/*"
+                            accept="image/*,application/pdf"
                             onChange={handleFileUpload}
                             className="hidden"
                             id="file-upload"
@@ -84,7 +84,7 @@ export default function FilePanel({
                                 <div className={`w-7 h-5 rounded text-xs font-bold flex items-center justify-center mr-3 text-white flex-shrink-0 ${
                                     file.type === 'png' ? 'bg-purple-600' :
                                         file.type === 'jpg' || file.type === 'jpeg' ? 'bg-green-600' :
-                                            'bg-blue-600'
+                                            file.type === 'pdf' ? 'bg-red-600' : 'bg-blue-600'
                                 }`}>
                                     {file.type}
                                 </div>

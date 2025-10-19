@@ -140,7 +140,7 @@
 textarea::-webkit-scrollbar {
     display: none;
 }
-/* Кастомизация скроллбара для главного контейнера */
+
 .scrollbar-custom::-webkit-scrollbar {
     width: 8px;
 }
