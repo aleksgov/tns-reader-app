@@ -15,7 +15,7 @@ app.add_middleware(
 )
 
 pipeline = create_pipeline(
-    pipeline="./ocr_config/pp_structure_config/PP-StructureV3.yaml",
+    pipeline="./ocr_config/PP-StructureV3.yaml",
     device="cpu",
 )
 

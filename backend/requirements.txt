@@ -1,0 +1,5 @@
+paddlepaddle
+paddlex[ocr]
+uvicorn[standard]
+fastapi
+python-multipart
