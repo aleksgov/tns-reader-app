@@ -20,57 +20,87 @@
 
 # Установка и запуск проекта TNS Reader
 
-## 1. Клонирование репозитория
+---
+
+## 1. Клонируем репозиторий
 
 ```bash
 git clone https://github.com/aleksgov/tns-reader-app.git
 cd tns-reader-app
 ```
+
 ---
 
 ## 2. Установка зависимостей
 
-### Фронтенд (React + Electron)
+### 2.1 Бэкенд (Python через Docker)
+
+Бэкенд запускается в Docker. Перед этим убедитесь, что **Docker Desktop** установлен и работает.
+
+1. Создаём Docker-образ:
 
 ```bash
-cd frontend
-npm install
+docker build -t paddlex_backend ./backend
 ```
 
-### Бэкенд (Python в Docker)
+> * `-t paddlex_backend` — имя создаваемого образа.
+> * `./backend` — путь к папке с бэкендом.
 
-Бэкенд теперь запускается в контейнере Docker. Перед первым запуском убедитесь, что Docker Desktop установлен и работает.
+2. Запускаем контейнер:
 
-> Из корня проекта
 ```bash
-docker-compose up --build -d
+docker run --name paddlex_backend -p 8000:8000 -v ${PWD}/backend:/app --restart unless-stopped paddlex_backend
 ```
 
-* `--build` – создаёт образ с нуля.
-* `-d` – запускает контейнер в фоновом режиме.
-* После этого бэкенд будет доступен на `http://localhost:8000`.
-
-Для проверки состояния:
+3. Проверяем, что контейнер работает:
 
 ```bash
 docker ps
 ```
-Документация Docker
+
+Документация по Docker:
 
 * [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-* [Документация по Docker Compose](https://docs.docker.com/compose/install/)
+* [Документация Docker Compose](https://docs.docker.com/compose/install/)
+
 ---
 
-## 3. Запуск проекта в режиме разработки
+### 2.2 Фронтенд (React + Electron)
 
-Фронтенд и Electron запускаются командой:
+1. Перейдите в папку фронтенда:
+
+```bash
+cd frontend
+```
+
+2. Установите зависимости:
+
+```bash
+npm install
+```
+
+---
+
+## 3. Запуск приложения в режиме разработки
+
+### 3.1 Backend
+
+Docker-контейнер должен быть уже запущен (см. шаг 2.1). Он будет доступен по адресу:
+
+```
+http://localhost:8000
+```
+
+### 3.2 Frontend + Electron
+
+В каталоге `frontend` выполните:
 
 ```bash
 npm run dev
 ```
 
-1. Ждёт, пока backend на `http://localhost:8000/health` будет доступен.
-2. Запускается React-frontend на `localhost:3000`.
-3. После этого запускается Electron и подхватывает фронтенд.
+> 1. React фронтенд запускается на `http://localhost:3000`.
+> 2. Electron подхватывает фронтенд и открывает десктопное приложение.
+> 3. Приложение ждёт, пока бэкенд будет доступен по `localhost:8000/health`.
 
 ---
